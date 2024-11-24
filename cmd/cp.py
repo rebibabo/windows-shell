@@ -29,6 +29,7 @@ class CpCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         srcs = self.get_file_list(self.src)
 

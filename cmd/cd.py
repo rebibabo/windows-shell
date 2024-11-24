@@ -5,7 +5,7 @@ from prompt_toolkit import HTML, print_formatted_text as print
 from cmd.base import Command
 
 class CdCommand(Command):
-
+    last_path = None  # 记录上一次的路径，用于 cd - 功能
     def __init__(self, command: str) -> 'CdCommand':
         """
         解析 cd 命令并返回 CdCommand 实例。
@@ -16,6 +16,7 @@ class CdCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         target_directory = self.directory
         if target_directory.endswith('\\') or target_directory.endswith('/'):
@@ -24,6 +25,16 @@ class CdCommand(Command):
         # 处理 ~ 符号
         if target_directory.startswith('~'):
             target_directory = os.path.expanduser(target_directory)
+
+        # 处理 - 符号
+        if target_directory == '-':
+            if CdCommand.last_path is None:
+                CdCommand.last_path = os.getcwd()
+                print(HTML(f"<error>Error: No previous directory to go back to.</error>"), style=self.log_style)
+                return
+            else:
+                target_directory = CdCommand.last_path
+        CdCommand.last_path = os.getcwd()
 
         # 正则匹配支持
         if '*' in target_directory or '?' in target_directory:
@@ -47,7 +58,7 @@ class CdCommand(Command):
         # 切换目录
         try:
             os.chdir(target_directory)
-            print(HTML(f"<success>Changed directory to: '{target_directory}'</success>"), style=self.log_style)
+            # print(HTML(f"<success>Changed directory to: '{target_directory}'</success>"), style=self.log_style)
         except Exception as e:
             print(HTML(f"<critical>Critical Error: Failed to change directory to '{target_directory}': {e}</critical>"), style=self.log_style)
 

@@ -22,6 +22,7 @@ class TouchCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         for file in self.files:
             filepath = normabs(file)

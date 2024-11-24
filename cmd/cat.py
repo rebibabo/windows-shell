@@ -22,6 +22,7 @@ class CatCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         if not self.files:
             print(HTML("<error>Error: No files specified.</error>"), style=self.log_style)
@@ -36,7 +37,7 @@ class CatCommand(Command):
                 continue
 
             try:
-                with open(file_path, 'r') as f:
+                with open(file_path, 'r', encoding='utf-8') as f:
                     lines = f.readlines()
 
                 line_number = 1

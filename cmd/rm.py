@@ -24,6 +24,7 @@ class RmCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         for target in self.targets:
             target_path = normabs(target)

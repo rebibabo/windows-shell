@@ -18,6 +18,7 @@ class KillCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         for pid in self.pids:
             try:

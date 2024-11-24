@@ -19,6 +19,7 @@ class PsCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         # 显示所有进程
         processes = psutil.process_iter(['pid', 'name', 'username', 'status'])

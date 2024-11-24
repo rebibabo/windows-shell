@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 from prompt_toolkit.styles import Style
+from prompt_toolkit import HTML
+from functools import wraps
 import os
 import re
 import glob
@@ -15,7 +17,7 @@ class Command:
         'critical': 'fg:ansiwhite bg:ansired',
     })
     
-    def __init__(self, command: str) -> 'Command':
+    def __init__(self, command: str='') -> 'Command':
         """
         从字符串解析命令并返回 Command 实例。
 
@@ -24,11 +26,10 @@ class Command:
         """
         # 将字符串拆分成列表，类似于命令行参数
         args = command.split()
+        if not hasattr(self, 'parser'):
+            return
         self.parser.add_argument("--help", action="store_true", help="Show this help message and exit")
         parsed_args = self.parser.parse_args(args)  # 解析命令参数
-        if parsed_args.help:
-            self.parser.print_help()
-            return
         for key, value in vars(parsed_args).items():
             setattr(self, key, value)  # 将解析结果添加到实例属性中
         
@@ -75,3 +76,27 @@ class Command:
             return file_list
 
         return []  # 其他情况返回空列表
+    
+    @staticmethod
+    def safe_exec(func):
+        """
+        安全执行函数，捕获异常并打印错误信息。
+
+        :param func: 要执行的函数。
+        :return: 装饰后的函数。
+        """
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self.help:
+                self.parser.print_help()
+                return None
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                print(HTML(f'<error>Error: {e}</error>'), file=self.log_file)  # 假设HTML是某种日志格式
+                return None
+        return wrapper
+
+        
+    def execute(self):
+        raise NotImplementedError("Subclasses should implement this!")

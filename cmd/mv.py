@@ -36,6 +36,7 @@ class MvCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         if self.help:
             self.parser.print_help()

@@ -23,6 +23,7 @@ class WgetCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         url = self.url
         output_path = normabs(self.output_document or os.path.basename(url))

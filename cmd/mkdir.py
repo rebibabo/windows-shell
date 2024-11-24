@@ -21,6 +21,7 @@ class MkdirCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         for dir_path in self.dirs:
             norm_dir_path = normabs(dir_path)

@@ -24,6 +24,7 @@ class TarCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         if not self.extract and not self.create:
             print(HTML("<error>Error: Must specify either -c to create or -x to extract.</error>"), style=self.log_style)

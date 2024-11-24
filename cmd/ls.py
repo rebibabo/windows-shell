@@ -97,7 +97,10 @@ class LsCommand(Command):
             files_info.append(file_info)
         return files_info
             
+    @Command.safe_exec
     def execute(self):
+        if not self.name:
+            self.name = ['.']
         for path in self.name:
             path = path.replace('~', os.path.expanduser('~'))
             files_info = self.get_file_info_list(path)

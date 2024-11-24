@@ -17,11 +17,14 @@ class PwdCommand(Command):
         self.parser = parser
         super().__init__(command)
 
+    @Command.safe_exec
     def execute(self):
         """
         执行 pwd 命令逻辑。
         """
-
+        if self.help:
+            self.parser.print_help()
+            return
         # 获取当前工作目录
         if self.logical:
             # 从环境变量中获取 PWD（可能包含符号链接）
