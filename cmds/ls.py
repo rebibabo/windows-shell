@@ -1,13 +1,13 @@
 import argparse
 from dataclasses import dataclass
 from datetime import datetime
-from prompt_toolkit import HTML, print_formatted_text as print
+from prompt_toolkit import HTML, print_formatted_text
 import os
 import html
 from prompt_toolkit.styles import Style
 import shutil
 from wcwidth import wcswidth
-from cmd.base import Command
+from cmds.base import Command
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
 
 def bytes_to_appropriate_unit(size_in_bytes):
@@ -29,7 +29,7 @@ class LsCommand(Command):
     file_style = Style.from_dict({
         'file': '#ffffff',
         'directory': '#28a0ea',
-        'link': '#20fe8b',
+        'link': 'ansiyellow',
         'filesize': 'ansiyellow',
         'last_write_time': '#ffffff',
     })
@@ -106,11 +106,11 @@ class LsCommand(Command):
             files_info = self.get_file_info_list(path)
             if self.l:
                 if self.R:
-                    print(HTML(f"<aaa bg='ansiblue'>{normabs(html.escape(path))}:</aaa>"))
+                    print_formatted_text(HTML(f"<aaa bg='ansiblue'>{normabs(html.escape(path))}:</aaa>"))
                 else:
-                    print(HTML(f"<aaa bg='ansiblue'>{html.escape(path)}:</aaa>"))
+                    print_formatted_text(HTML(f"<aaa bg='ansiblue'>{html.escape(path)}:</aaa>"))
             if not files_info and not self.R:
-                print(HTML(f"<aaa bg='ansired'>cannot access '{html.escape(path)}': No such file or directory</aaa>\n"))
+                print_formatted_text(HTML(f"<aaa bg='ansired'>cannot access '{html.escape(path)}': No such file or directory</aaa>\n"))
                 continue
             files_info.sort(key=lambda x: x['basename'], reverse=self.r)
             if self.t:
@@ -120,7 +120,7 @@ class LsCommand(Command):
             
             if not self.l:
                 # 获取终端宽度
-                terminal_width = shutil.get_terminal_size().columns
+                terminal_width = int(shutil.get_terminal_size().columns * 1.6)
                 # 从最大列数开始尝试
                 num_files = len(files_info)
                 # 函数：计算字符串的显示宽度（考虑非 ASCII 字符）
@@ -174,18 +174,18 @@ class LsCommand(Command):
                             else:
                                 item = f"<file>{item['basename']}</file>"
                             row_content += item + " " * padding
-                    print(HTML(row_content), style=self.file_style)
+                    print_formatted_text(HTML(row_content), style=self.file_style)
             else:
                 for file in files_info:
                     size = file['h_size'] if self.h else file['size']
-                    print(HTML(f"<filesize>{size:>12}</filesize>"), style=self.file_style, end='  ')
-                    print(HTML(f"<last_write_time>{file['last_write_time']}</last_write_time>"), style=self.file_style, end='  ')
+                    print_formatted_text(HTML(f"<filesize>{size:>12}</filesize>"), style=self.file_style, end='  ')
+                    print_formatted_text(HTML(f"<last_write_time>{file['last_write_time']}</last_write_time>"), style=self.file_style, end='  ')
                     if file['mode'] == 'd':
-                        print(HTML(f"<directory>{file['basename']}{'/' if self.F else ''}</directory>"), style=self.file_style)
+                        print_formatted_text(HTML(f"<directory>{file['basename']}{'/' if self.F else ''}</directory>"), style=self.file_style)
                     elif file['mode'] == 'l':
-                        print(HTML(f"<link>{file['basename']}</link>{'*' if self.F else ''}"), style=self.file_style)
+                        print_formatted_text(HTML(f"<link>{file['basename']}</link>{'*' if self.F else ''}"), style=self.file_style)
                     else:
-                        print(HTML(f"<file>{file['basename']}</file>"), style=self.file_style)
+                        print_formatted_text(HTML(f"<file>{file['basename']}</file>"), style=self.file_style)
             
             if self.R and files_info:
                 # directories = [dir["fullpath"] for dir in files_info if dir['mode'] == 'd']

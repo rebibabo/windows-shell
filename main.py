@@ -1,24 +1,22 @@
 import os
 import re
-from cmd import Cmd
+from cmds import Cmd
 from prompt_toolkit import PromptSession
 from prompt_toolkit.styles import Style, merge_styles
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit import print_formatted_text as print
 from prompt_toolkit.key_binding import KeyBindings
-from cmd.ls import LsCommand
+from cmds.ls import LsCommand
 from style import ShellLexer
 from pygments.styles import get_style_by_name
-from prompt_toolkit.shortcuts import prompt
-from prompt_toolkit.lexers import PygmentsLexer, pygments
+from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
-
+from prompt_toolkit import prompt
 
 import getpass
 user = getpass.getuser()
 bindings = KeyBindings()
-history_path = os.path.join(os.getcwd(), 'history.txt')
+history_path = os.path.join(os.path.dirname(__file__), 'history.txt')
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
 
 class CmdHistory:
@@ -26,7 +24,7 @@ class CmdHistory:
         self.max_size = max_size
         self.history = []
         if not os.path.exists(history_path):
-            with open(history_path, 'w') as f:
+            with open(history_path, 'w', encoding='utf-8') as f:
                 f.write('')
             return
         with open(history_path, 'r') as f:
@@ -38,13 +36,13 @@ class CmdHistory:
             self.history = []
         else:
             self.history = self.history[-left_num:] 
-        with open(history_path, 'w') as f:
+        with open(history_path, 'w',  encoding='utf-8') as f:
             for cmd in self.history:
                 f.write(cmd+'\n')     
                 
     def add(self, cmd):
         self.history.append(cmd)
-        with open(history_path, 'a') as f:
+        with open(history_path, 'a',  encoding='utf-8') as f:
             f.write(cmd+'\n')
           
     @ property           
@@ -92,6 +90,7 @@ class CmdWindow:
                     ('class:path',      os.getcwd()),
                     ('class:pound',    '$ '),
                 ]
+
                 text = self.session.prompt(prefix, 
                                            style=self.style, 
                                            key_bindings=bindings, 
@@ -114,6 +113,11 @@ class CmdWindow:
     @bindings.add('tab', filter=True)
     def complete_path( event):
         current_text = CmdWindow.session.app.current_buffer.text      # 获取当前输入的命令
+        
+        document = CmdWindow.session.app.current_buffer.document
+        cursor_position = document.cursor_position      # 获取光标位置
+        current_text = current_text[:cursor_position]   # 获取当前光标前面部分
+        
         if not current_text:        # 如果当前什么也没有输入，按下Tab键，则补全当前目录
             current_text = os.getcwd()
         ori_path = current_text.split()[-1]     # 获取当前输入的命令的最后一个参数，即路径

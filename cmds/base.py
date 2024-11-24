@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import List
+from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.styles import Style
 from prompt_toolkit import HTML
 from functools import wraps
@@ -93,7 +94,7 @@ class Command:
             try:
                 return func(self, *args, **kwargs)
             except Exception as e:
-                print(HTML(f'<error>Error: {e}</error>'), file=self.log_file)  # 假设HTML是某种日志格式
+                print_formatted_text(HTML(f'<error>Error: {e}</error>'), style=Command.log_style)  # 假设HTML是某种日志格式
                 return None
         return wrapper
 

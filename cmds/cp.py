@@ -2,8 +2,8 @@ import argparse
 import os
 import shutil
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text as print
-from cmd.base import Command
+from prompt_toolkit import HTML, print_formatted_text
+from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
 
@@ -35,7 +35,7 @@ class CpCommand(Command):
 
         # 检查源路径是否存在
         if not srcs:
-            print(HTML(f"<error>Error: Source '{self.src}' does not exist.</error>"), style=self.log_style)
+            print_formatted_text(HTML(f"<error>Error: Source '{self.src}' does not exist.</error>"), style=self.log_style)
             return
 
         for src in srcs:
@@ -50,14 +50,14 @@ class CpCommand(Command):
                 if self.interactive:
                     response = input(f"Overwrite '{dst}'? [y/N]: ").strip().lower()
                     if response not in ['y', 'yes']:
-                        print(HTML(f"<warning>Skipped: '{dst}' not overwritten.</warning>"), style=self.log_style)
+                        print_formatted_text(HTML(f"<warning>Skipped: '{dst}' not overwritten.</warning>"), style=self.log_style)
                         return
                 elif self.update:
                     if os.path.getmtime(src) <= os.path.getmtime(dst):
-                        print(f"Skipped: '{dst}' is up to date.")
+                        print_formatted_text(f"Skipped: '{dst}' is up to date.")
                         return
                 elif not self.force:
-                    print(HTML(f"<error>Error: '{dst}' already exists. Use -f to force overwrite.</error>"), style=self.log_style)
+                    print_formatted_text(HTML(f"<error>Error: '{dst}' already exists. Use -f to force overwrite.</error>"), style=self.log_style)
                     return
 
             # 创建链接而非复制
@@ -65,30 +65,30 @@ class CpCommand(Command):
                 try:
                     os.link(src, dst)
                     if self.verbose:
-                        print(HTML(f"<success>Linked '{src}' to '{dst}'</success>"), style=self.log_style)
+                        print_formatted_text(HTML(f"<success>Linked '{src}' to '{dst}'</success>"), style=self.log_style)
                 except Exception as e:
-                    print(HTML(f"<error>Error: Failed to link '{src}' to '{dst}': {e}</error>"), style=self.log_style)
+                    print_formatted_text(HTML(f"<error>Error: Failed to link '{src}' to '{dst}': {e}</error>"), style=self.log_style)
                 return
 
             # 执行复制操作
             try:
                 if os.path.isdir(src):
                     if not (self.recursive or self.archive):
-                        print(HTML(f"<error>Error: '{src}' is a directory. Use -r or -a to copy directories.</error>"), style=self.log_style)
+                        print_formatted_text(HTML(f"<error>Error: '{src}' is a directory. Use -r or -a to copy directories.</error>"), style=self.log_style)
                         return
                     shutil.copytree(src, dst, dirs_exist_ok=True)
                 else:
                     shutil.copy2(src, dst) if self.preserve else shutil.copy(src, dst)
 
                 if self.verbose:
-                    print(HTML(f"Copied <aaa fg='ansiyellow'>'{src}'</aaa> to <aaa fg='ansigreen'>'{dst}'</aaa>"))
+                    print_formatted_text(HTML(f"Copied <aaa fg='ansiyellow'>'{src}'</aaa> to <aaa fg='ansigreen'>'{dst}'</aaa>"))
 
                 # 保留文件权限等属性
                 if self.archive or self.preserve:
                     shutil.copystat(src, dst)
 
             except Exception as e:
-                print(HTML(f"<critical>Critical Error: Failed to copy '{src}' to '{dst}': {e}</critical>"), style=self.log_style)
+                print_formatted_text(HTML(f"<critical>Critical Error: Failed to copy '{src}' to '{dst}': {e}</critical>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

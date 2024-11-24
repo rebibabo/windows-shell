@@ -1,8 +1,8 @@
 import argparse
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text as print
-from cmd.base import Command
+from prompt_toolkit import HTML, print_formatted_text
+from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
 
@@ -25,7 +25,7 @@ class CatCommand(Command):
     @Command.safe_exec
     def execute(self):
         if not self.files:
-            print(HTML("<error>Error: No files specified.</error>"), style=self.log_style)
+            print_formatted_text(HTML("<error>Error: No files specified.</error>"), style=self.log_style)
             return
 
         for file_path in self.files:
@@ -33,7 +33,7 @@ class CatCommand(Command):
             
             # 检查文件是否存在
             if not os.path.isfile(file_path):
-                print(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
+                print_formatted_text(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
                 continue
 
             try:
@@ -49,10 +49,10 @@ class CatCommand(Command):
                         line_prefix = ""
 
                     line_content = line.rstrip("\n") + ("$" if self.show_ends else "")
-                    print(HTML(f"{line_prefix}{line_content}"))
+                    print_formatted_text(HTML(f"{line_prefix}{line_content}"))
 
             except Exception as e:
-                print(HTML(f"<critical>Critical Error: Failed to read file '{file_path}': {e}</critical>"), style=self.log_style)
+                print_formatted_text(HTML(f"<critical>Critical Error: Failed to read file '{file_path}': {e}</critical>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

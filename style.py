@@ -1,6 +1,7 @@
 
 import re
 import os
+from cmds import commands
 from pygments.lexer import RegexLexer, bygroups, include
 from pygments.token import Punctuation, Whitespace, Text, Comment, Operator, Keyword, Name, String, Number
     
@@ -41,7 +42,7 @@ class ShellLexer(RegexLexer):
     finally:
         reg.CloseKey(key)
 
-    cmds = sorted([re.escape(cmd) for cmd in set(cmds)])    # 去重+转义+排序，c++这种不转义会报错
+    system_cmds = sorted([re.escape(cmd) for cmd in set(cmds)])    # 去重+转义+排序，c++这种不转义会报错
 
     tokens = {
         'root': [
@@ -62,7 +63,8 @@ class ShellLexer(RegexLexer):
             (r'\b(if|fi|else|while|in|do|done|for|then|return|case|'
              r'select|continue|until|esac|elif)(\s*)\b',
              bygroups(Keyword, Whitespace)),
-            (rf'\b({"|".join(cmds)})(?=[\s)`])', Keyword),  
+            (rf'\b({"|".join(system_cmds)})(?=[\s)`])', Keyword), 
+            (rf'\b({"|".join(commands)})', Keyword), 
             (r'\A#!.+\n', Comment.Hashbang),
             (r'#.*\n', Comment.Single),
             (r'\\[\w\W]', String.Escape),

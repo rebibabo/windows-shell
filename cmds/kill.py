@@ -1,8 +1,8 @@
 import argparse
 import os
 import signal
-from prompt_toolkit import HTML, print_formatted_text as print
-from cmd.base import Command
+from prompt_toolkit import HTML, print_formatted_text
+from cmds.base import Command
 from dataclasses import dataclass
 
 @dataclass
@@ -23,13 +23,13 @@ class KillCommand(Command):
         for pid in self.pids:
             try:
                 os.kill(pid, signal.SIGTERM)
-                print(HTML(f"<success>Sent 'Killed process {pid}.</success>"), style=self.log_style)
+                print_formatted_text(HTML(f"<success>Sent 'Killed process {pid}.</success>"), style=self.log_style)
             except ProcessLookupError:
-                print(HTML(f"<error>Error: No process with PID {pid} exists.</error>"), style=self.log_style)
+                print_formatted_text(HTML(f"<error>Error: No process with PID {pid} exists.</error>"), style=self.log_style)
             except PermissionError:
-                print(HTML(f"<error>Error: Permission denied to kill process {pid}.</error>"), style=self.log_style)
+                print_formatted_text(HTML(f"<error>Error: Permission denied to kill process {pid}.</error>"), style=self.log_style)
             except Exception as e:
-                print(HTML(f"<critical>Critical Error: Failed to kill process {pid}: {e}</critical>"), style=self.log_style)
+                print_formatted_text(HTML(f"<critical>Critical Error: Failed to kill process {pid}: {e}</critical>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

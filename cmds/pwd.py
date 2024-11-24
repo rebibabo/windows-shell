@@ -1,8 +1,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text as print
-from cmd.base import Command
+from cmds.base import Command
 
 @dataclass
 class PwdCommand(Command):
