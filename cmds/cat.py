@@ -3,6 +3,8 @@ import os
 from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text
 from cmds.base import Command
+from prompt_toolkit.application.current import get_app_session
+from prompt_toolkit.output.defaults import create_output
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
 
@@ -24,6 +26,17 @@ class CatCommand(Command):
 
     @Command.safe_exec
     def execute(self):
+        import sys
+        import io
+        # original_stdout = sys.stdout
+        # output_stream = io.StringIO()
+        # sys.stdout = output_stream
+            
+        # app = get_app_session()    
+        # original_stdout = app._output
+        # app._output = create_output(stdout=io.StringIO())
+        # output = create_output(stdout=io.StringIO())
+        # print("in") 
         if not self.files:
             print_formatted_text(HTML("<error>Error: No files specified.</error>"), style=self.log_style)
             return
@@ -53,7 +66,10 @@ class CatCommand(Command):
 
             except Exception as e:
                 print_formatted_text(HTML(f"<critical>Critical Error: Failed to read file '{file_path}': {e}</critical>"), style=self.log_style)
-
+        
+        # b = app._output.stdout.getvalue()
+        # app._output = original_stdout
+                
 # 示例用法
 if __name__ == "__main__":
     command = "-n history.txt"  # 示例命令

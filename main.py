@@ -27,7 +27,7 @@ class CmdHistory:
             with open(history_path, 'w', encoding='utf-8') as f:
                 f.write('')
             return
-        with open(history_path, 'r') as f:
+        with open(history_path, 'r', encoding='utf-8') as f:
             for line in f:
                 self.history.append(line.strip())
                 

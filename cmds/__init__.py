@@ -1,7 +1,8 @@
 import os
 import io
-import sys
-from prompt_toolkit import prompt
+import inspect
+from prompt_toolkit.application.current import get_app_session
+from prompt_toolkit.output.defaults import create_output
 
 commands = []
 cur_dir = os.path.dirname(__file__)
@@ -14,18 +15,6 @@ for command in commands:
     exec(f"from cmds.{command} import {command.capitalize()}Command")
 
 class Cmd:
-    # def __init__(self, cmd):
-    #     type = cmd.split()[0]                  
-    #     command = ' '.join(cmd.split()[1:])
-    #     if type in commands:
-    #         try:
-    #             command = eval(f"{type.capitalize()}Command(command)")
-    #             command.execute()
-    #         except:
-    #             pass
-    #     else:
-    #         os.system(cmd)
-    
     def __init__(self, cmd):
         # 解析命令，判断是否有管道符
         if '|' in cmd:
@@ -53,9 +42,9 @@ class Cmd:
         
         # 如果当前命令是最后一个命令，输出到标准输出
         if not last:
-            original_stdout = sys.stdout
-            output_stream = io.StringIO()
-            sys.stdout = output_stream  # 否则将输出重定向到 StringIO 缓存
+            app = get_app_session()    
+            original_stdout = app._output
+            app._output = create_output(stdout=io.StringIO())
         
         # 执行命令
         if type in commands:
@@ -63,7 +52,7 @@ class Cmd:
                 # 如果有输入流，就传递给 execute 的 stream 参数
                 command_class = eval(f"{type.capitalize()}Command(command)")
                 # 判断command_class.execute是否有stream参数，如果有就传递input_stream
-                if 'stream' in command_class.execute.__code__.co_varnames:
+                if len(inspect.signature(command_class.execute).parameters) == 1:
                     command_class.execute(stream=input_stream)
                 else:
                     command_class.execute()
@@ -75,8 +64,7 @@ class Cmd:
         
         # 恢复标准输出
         if not last:
-            sys.stdout = original_stdout
-            print("yewfweh")
-            prompt(output_stream.getvalue())
-            return io.StringIO(output_stream.getvalue())
+            output = app._output.stdout
+            app._output = original_stdout
+            return output
         return None  # 最后一条命令不返回任何流，因为它的输出直接打印到标准输出

@@ -26,7 +26,7 @@ class WcCommand(Command):
     def execute(self, stream=None):
         if stream:
             # 从流中读取内容
-            lines = stream.readlines()
+            lines = stream.getvalue().split('\n')
             self._count_lines(words=lines)
         else:
             if not self.files:

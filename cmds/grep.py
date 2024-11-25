@@ -17,14 +17,19 @@ class GrepCommand(Command):
         parser.add_argument("-i", "--ignore-case", action="store_true", help="Ignore case distinctions in patterns and data")
         parser.add_argument("-v", "--invert-match", action="store_true", help="Select non-matching lines")
         parser.add_argument("-n", "--line-number", action="store_true", help="Prefix each line of output with the line number")
-        parser.add_argument("-e", "--regexp", type=str, required=True, help="PATTERN to search for")
+        parser.add_argument("-e", "--regexp", type=str, help="PATTERN to search for")
         parser.add_argument("files", nargs="*", type=str, help="Files to search")
         
         self.parser = parser
+        self.pipe = False
         super().__init__(command)
 
     @Command.safe_exec
     def execute(self, stream=None):
+        if stream:
+            self.regexp = self.files[0]
+            self.files = []
+            self.pipe = True
         try:
             # 编译正则表达式，支持忽略大小写选项 dpf def
             pattern = re.compile(self.regexp, re.IGNORECASE if self.ignore_case else 0)
@@ -33,7 +38,7 @@ class GrepCommand(Command):
             return
 
         if stream:
-            lines = stream.readlines()
+            lines = stream.getvalue().split('\n')
             self._process_lines(lines, pattern)
         else:
             if not self.files:
@@ -78,7 +83,7 @@ class GrepCommand(Command):
                         print(line[idx: l], end='')
                         print_formatted_text(HTML(f"<aaa bg='ansired'>{line[l:r]}</aaa>"), end='')
                         idx = r
-                    print(line[idx:], end='')
+                    print(line[idx:], end='\n' if self.pipe else '')
 
 # 示例用法
 if __name__ == "__main__":
@@ -101,6 +106,6 @@ if __name__ == "__main__":
     """
     stream = io.StringIO(input_data)
 
-    command = "-e def"
+    command = "def"
     grep_command = GrepCommand(command)
     grep_command.execute(stream=stream)
