@@ -2,6 +2,7 @@ import argparse
 import os
 from dataclasses import dataclass
 from cmds.base import Command
+from prompt_toolkit import print_formatted_text
 
 @dataclass
 class PwdCommand(Command):
@@ -33,7 +34,7 @@ class PwdCommand(Command):
             pwd = os.path.realpath(os.getcwd())
 
         # 打印工作目录
-        print(pwd, style=self.log_style)
+        print_formatted_text(pwd, style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

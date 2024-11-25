@@ -1,0 +1,39 @@
+#Requires AutoHotkey v2.0
+#SingleInstance force
+
+^t:: { ; 当按下 Ctrl+T 时触发
+
+    ; 检查是否是 File Explorer 窗口
+    if WinActive("ahk_exe explorer.exe") {
+        ; 获取当前路径
+        explorerPath := GetExplorerPath()
+
+        ; 如果路径有效，打开 cmd
+        if explorerPath {
+            Run("cmd.exe", A_ScriptDir)
+            Sleep(200)
+            Send("python main.py " "`"" explorerPath "`"" "{Enter}")
+            Sleep(200)
+            return
+        }
+    } 
+    Run("cmd.exe", A_ScriptDir)
+    Sleep(200)
+    Send("python main.py " A_Desktop "{Enter}")
+    Sleep(200)
+}
+
+GetExplorerPath() {
+    try {
+        shellApp := ComObject("Shell.Application") ; 创建 Shell.Application 对象
+        for window in shellApp.Windows {
+            ; 检查活动窗口
+            if (window.HWND = WinGetID("A")) {
+                return window.Document.Folder.Self.Path
+            }
+        }
+    } catch {
+        return ""
+    }
+    return ""
+}

@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from cmds import Cmd
 from prompt_toolkit import PromptSession
 from prompt_toolkit.styles import Style, merge_styles
@@ -146,5 +147,7 @@ class CmdWindow:
             CmdWindow.tab_two = not CmdWindow.tab_two
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        os.chdir(normabs(sys.argv[1]))
     cmd_window = CmdWindow()
     cmd_window.run()
