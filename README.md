@@ -17,3 +17,7 @@
 
 - 支持管道操作，自动补全路径，以及智能补全历史命令
 ![11月25日(4)](https://github.com/user-attachments/assets/3f98fa80-e495-41bd-aabc-341b5b485f9d)
+
+# 快捷键启动
+使用AutoHotKey v2工具实现快捷键启动，[AutoHotKey v2下载链接](https://www.autohotkey.com/download/ahk-v2.exe)，在任意一个文件管理器中，输入`Ctrl + T`进入命令行
+![11月25日(6)](https://github.com/user-attachments/assets/9045f3f8-17e0-43c9-bd54-6fc9ff37c501)
