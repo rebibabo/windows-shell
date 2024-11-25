@@ -1,6 +1,10 @@
 # 介绍
 为了在windows系统上模拟linux命令，依靠强大的prompt_toolkit工具，开发了一套mini操作系统，支持输入高亮、智能命令补全等比原生git bash更强大的功能，但是还是有很多bug没解决。
 
+# 环境安装
+仅依赖prompt-toolkit工具，纯python代码
+```pip install prompt_toolkit```
+
 # 启动脚本
 运行main.py即可
 ```python main.py```
