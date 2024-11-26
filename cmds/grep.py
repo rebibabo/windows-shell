@@ -27,6 +27,9 @@ class GrepCommand(Command):
     @Command.safe_exec
     def execute(self, stream=None):
         if stream:
+            if not self.files:
+                print_formatted_text(HTML("<error>Error: No expression specified.</error>"), style=self.log_style)
+                return
             self.regexp = self.files[0]
             self.files = []
             self.pipe = True
@@ -38,7 +41,9 @@ class GrepCommand(Command):
             return
 
         if stream:
+            ansi_escape = re.compile(r'\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')  # 用于清除 ANSI 转义序列
             lines = stream.getvalue().split('\n')
+            lines = [ansi_escape.sub('', line)+'\n' for line in lines]
             self._process_lines(lines, pattern)
         else:
             if not self.files:
@@ -74,16 +79,17 @@ class GrepCommand(Command):
             if match:
                 prefix = f"{line_number:6}  " if self.line_number else ""
                 if self.invert_match:
-                    print(f"{prefix}{line.rstrip()}")
+                    print_formatted_text(f"{prefix}{line.rstrip()}")
                 else:
-                    print(prefix, end='')
+                    print_formatted_text(prefix, end='')
                     idx = 0
                     for m in pattern.finditer(line):
                         l, r = m.span()
-                        print(line[idx: l], end='')
+                        print_formatted_text(line[idx: l], end='')
+                        # print((f"\033[1;31;41m{line[l:r]}\033[0m"), end='')
                         print_formatted_text(HTML(f"<aaa bg='ansired'>{line[l:r]}</aaa>"), end='')
                         idx = r
-                    print(line[idx:], end='\n' if self.pipe else '')
+                    print_formatted_text(line[idx:], end='')
 
 # 示例用法
 if __name__ == "__main__":

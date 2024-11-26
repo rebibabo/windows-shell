@@ -66,5 +66,6 @@ class Cmd:
         if not last:
             output = app._output.stdout
             app._output = original_stdout
+            # input(output.getvalue())
             return output
         return None  # 最后一条命令不返回任何流，因为它的输出直接打印到标准输出

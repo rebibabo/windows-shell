@@ -99,6 +99,7 @@ class LsCommand(Command):
             
     @Command.safe_exec
     def execute(self):
+        output_str = ''
         if not self.name:
             self.name = ['.']
         for path in self.name:
@@ -175,20 +176,25 @@ class LsCommand(Command):
                                 item = f"<file>{item['basename']}</file>"
                             row_content += item + " " * padding
                     print_formatted_text(HTML(row_content), style=self.file_style)
+                    output_str += row_content
             else:
                 for file in files_info:
                     size = file['h_size'] if self.h else file['size']
                     print_formatted_text(HTML(f"<filesize>{size:>12}</filesize>"), style=self.file_style, end='  ')
+                    output_str += f"{size:>12}  "
                     print_formatted_text(HTML(f"<last_write_time>{file['last_write_time']}</last_write_time>"), style=self.file_style, end='  ')
+                    output_str += file['last_write_time'] + '  '
                     if file['mode'] == 'd':
                         print_formatted_text(HTML(f"<directory>{file['basename']}{'/' if self.F else ''}</directory>"), style=self.file_style)
+                        output_str += file['basename'] + ('/' if self.F else '')
                     elif file['mode'] == 'l':
                         print_formatted_text(HTML(f"<link>{file['basename']}</link>{'*' if self.F else ''}"), style=self.file_style)
+                        output_str += file['basename'] + ('*' if self.F else '')
                     else:
                         print_formatted_text(HTML(f"<file>{file['basename']}</file>"), style=self.file_style)
+                        output_str += file['basename']
             
             if self.R and files_info:
-                # directories = [dir["fullpath"] for dir in files_info if dir['mode'] == 'd']
                 directories = []
                 for file in os.listdir(os.path.dirname(files_info[0]['fullpath'])):
                     if os.path.isdir(file):
@@ -196,7 +202,9 @@ class LsCommand(Command):
                 if not directories:
                     continue
                 self.name = directories
-                self.execute()
+                recursive_output = self.execute()
+                output_str += recursive_output
+        return output_str
                 
 if __name__ == "__main__":
     # 输入 lsr 命令的字符串
