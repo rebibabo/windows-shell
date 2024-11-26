@@ -120,7 +120,7 @@ class LsCommand(Command):
             
             if not self.l:
                 # 获取终端宽度
-                terminal_width = int(shutil.get_terminal_size().columns * 1.6)
+                terminal_width = int(shutil.get_terminal_size().columns)
                 # 从最大列数开始尝试
                 num_files = len(files_info)
                 # 函数：计算字符串的显示宽度（考虑非 ASCII 字符）

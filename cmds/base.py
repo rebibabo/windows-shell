@@ -27,10 +27,15 @@ class Command:
         """
         # 将字符串拆分成列表，类似于命令行参数
         args = command.split()
+        self.parse_error = False
         if not hasattr(self, 'parser'):
             return
         self.parser.add_argument("--help", action="store_true", help="Show this help message and exit")
-        parsed_args = self.parser.parse_args(args)  # 解析命令参数
+        try:
+            parsed_args = self.parser.parse_args(args)  # 解析命令参数
+        except SystemExit:
+            self.parse_error = True
+            return None
         for key, value in vars(parsed_args).items():
             setattr(self, key, value)  # 将解析结果添加到实例属性中
         
@@ -88,6 +93,8 @@ class Command:
         """
         @wraps(func)
         def wrapper(self, *args, **kwargs):
+            if self.parse_error:
+                return None
             if self.help:
                 self.parser.print_help()
                 return None

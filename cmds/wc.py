@@ -27,7 +27,7 @@ class WcCommand(Command):
         if stream:
             # 从流中读取内容
             lines = stream.getvalue().split('\n')
-            self._count_lines(words=lines)
+            self._count_lines(lines)
         else:
             if not self.files:
                 print_formatted_text(HTML("<error>Error: No files specified and no input stream provided.</error>"), style=self.log_style)
