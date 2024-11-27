@@ -2,6 +2,7 @@ import argparse
 import os
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
+import html
 
 class CatCommand(Command):
 
@@ -45,7 +46,7 @@ class CatCommand(Command):
                         line_prefix = ""
 
                     line_content = line.rstrip("\n") + ("$" if self.show_ends else "")
-                    print(HTML(f"{line_prefix}{line_content}"))
+                    print(HTML(f"{line_prefix}{html.escape(line_content)}"))
 
             except Exception as e:
                 print(HTML(f"<critical>Critical Error: Failed to read file '{file_path}': {e}</critical>"), style=self.log_style)

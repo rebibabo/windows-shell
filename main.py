@@ -69,7 +69,7 @@ class CmdWindow:
         'path':     '#28a0ea underline',
     })
     
-    pygments_style = style_from_pygments_cls(get_style_by_name('manni'))
+    pygments_style = style_from_pygments_cls(get_style_by_name('github-dark'))    # manni github-dark
     style = merge_styles([custom_style, pygments_style])
     
     cmd_history = CmdHistory()
