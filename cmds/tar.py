@@ -1,13 +1,9 @@
 import argparse
 import os
 import tarfile
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class TarCommand(Command):
 
     def __init__(self, command: str) -> 'TarCommand':
@@ -30,7 +26,7 @@ class TarCommand(Command):
             print(HTML("<error>Error: Must specify either -c to create or -x to extract.</error>"), style=self.log_style)
             return
 
-        tar_file = normabs(self.file)
+        tar_file = self.normabs(self.file)
 
         if self.extract:
             self.extract_tar(tar_file)
@@ -43,7 +39,7 @@ class TarCommand(Command):
             return
 
         extract_path = self.directory if self.directory else os.getcwd()
-        extract_path = normabs(extract_path)
+        extract_path = self.normabs(extract_path)
 
         try:
             with tarfile.open(tar_file, "r") as tar:

@@ -1,14 +1,8 @@
 import argparse
 import os
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
-from prompt_toolkit.application.current import get_app_session
-from prompt_toolkit.output.defaults import create_output
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class CatCommand(Command):
 
     def __init__(self, command: str) -> 'CatCommand':
@@ -31,7 +25,7 @@ class CatCommand(Command):
             return
 
         for file_path in self.files:
-            file_path = normabs(file_path)
+            file_path = self.normabs(file_path)
             
             # 检查文件是否存在
             if not os.path.isfile(file_path):

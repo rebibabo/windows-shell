@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import List
 from prompt_toolkit import HTML, print_formatted_text as print
 from prompt_toolkit.styles import Style
@@ -8,7 +7,6 @@ import os
 import re
 import glob
 
-@dataclass
 class Command:
     name: List[str] = None
     log_style: dict = Style.from_dict({
@@ -26,6 +24,7 @@ class Command:
         :return: Command 实例
         """
         # 将字符串拆分成列表，类似于命令行参数
+        self.normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
         args = self.split_command(command)
         self.parse_error = False
         if not hasattr(self, 'parser'):

@@ -1,13 +1,9 @@
 import os
 import argparse
 import requests
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class WgetCommand(Command):
     def __init__(self, command: str) -> 'WgetCommand':
         """
@@ -26,7 +22,7 @@ class WgetCommand(Command):
     @Command.safe_exec
     def execute(self):
         url = self.url
-        output_path = normabs(self.output_document or os.path.basename(url))
+        output_path = self.normabs(self.output_document or os.path.basename(url))
         
         if not url:
             print(HTML("<error>Error: No URL specified.</error>"), style=self.log_style)

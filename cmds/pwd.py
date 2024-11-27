@@ -1,10 +1,8 @@
 import argparse
 import os
-from dataclasses import dataclass
 from cmds.base import Command
 from prompt_toolkit import print_formatted_text as print
 
-@dataclass
 class PwdCommand(Command):
     def __init__(self, command: str) -> 'PwdCommand':
         """

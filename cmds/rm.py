@@ -1,13 +1,9 @@
 import argparse
 import os
 import shutil
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class RmCommand(Command):
 
     def __init__(self, command: str) -> 'RmCommand':
@@ -27,7 +23,7 @@ class RmCommand(Command):
     @Command.safe_exec
     def execute(self):
         for target in self.targets:
-            target_path = normabs(target)
+            target_path = self.normabs(target)
             target_files = self.get_file_list(target_path, traverse=False)
             
             # 检查路径是否存在

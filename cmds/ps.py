@@ -1,12 +1,9 @@
 import argparse
 import psutil
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-@dataclass
 class PsCommand(Command):
-
     def __init__(self, command: str) -> 'PsCommand':
         """
         解析 ps 命令并返回 PsCommand 实例。

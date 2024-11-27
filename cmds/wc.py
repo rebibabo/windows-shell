@@ -1,12 +1,8 @@
 import argparse
 import os
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class WcCommand(Command):
     def __init__(self, command: str) -> 'WcCommand':
         """
@@ -33,7 +29,7 @@ class WcCommand(Command):
                 return
 
             for file_path in self.files:
-                file_path = normabs(file_path)
+                file_path = self.normabs(file_path)
                 file_lists = self.get_file_list(file_path)
 
                 if not file_lists:

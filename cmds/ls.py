@@ -1,5 +1,4 @@
 import argparse
-from dataclasses import dataclass
 from datetime import datetime
 from prompt_toolkit import HTML, print_formatted_text as print
 import os
@@ -8,7 +7,6 @@ from prompt_toolkit.styles import Style
 import shutil
 from wcwidth import wcswidth
 from cmds.base import Command
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
 
 def bytes_to_appropriate_unit(size_in_bytes):
     # 定义单位和对应的字节数
@@ -24,7 +22,6 @@ def bytes_to_appropriate_unit(size_in_bytes):
     # 如果所有单位都不合适，返回原字节数
     return f"{size_in_bytes}"
 
-@dataclass
 class LsCommand(Command):
     file_style = Style.from_dict({
         'file': '#ffffff',
@@ -72,8 +69,8 @@ class LsCommand(Command):
             file_info = {}
             dirname = os.path.dirname(file)
             file_info['basename'] = html.escape(os.path.basename(file)).replace('/', '')
-            file_info['dirname'] = html.escape(normabs(dirname))
-            file_info['fullpath'] = html.escape(normabs(file))
+            file_info['dirname'] = html.escape(self.normabs(dirname))
+            file_info['fullpath'] = html.escape(self.normabs(file))
             
             if os.path.isdir(file):
                 file_info['mode'] = 'd'
@@ -106,7 +103,7 @@ class LsCommand(Command):
             files_info = self.get_file_info_list(path)
             if self.l:
                 if self.R:
-                    print(HTML(f"<aaa bg='ansiblue'>{normabs(html.escape(path))}:</aaa>"))
+                    print(HTML(f"<aaa bg='ansiblue'>{self.normabs(html.escape(path))}:</aaa>"))
                 else:
                     print(HTML(f"<aaa bg='ansiblue'>{html.escape(path)}:</aaa>"))
             if not files_info and not self.R:

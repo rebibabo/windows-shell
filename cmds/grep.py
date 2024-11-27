@@ -1,13 +1,9 @@
 import argparse
 import os
 import re
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class GrepCommand(Command):
     def __init__(self, command: str) -> 'GrepCommand':
         """
@@ -50,7 +46,7 @@ class GrepCommand(Command):
                 return
             
             for file_path in self.files:
-                file_path = normabs(file_path)
+                file_path = self.normabs(file_path)
                 file_lists = self.get_file_list(file_path)
                 # 检查文件是否存在
                 if not file_lists:

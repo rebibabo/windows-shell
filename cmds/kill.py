@@ -3,9 +3,7 @@ import os
 import signal
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
-from dataclasses import dataclass
 
-@dataclass
 class KillCommand(Command):
 
     def __init__(self, command: str) -> 'KillCommand':

@@ -1,12 +1,8 @@
 import argparse
 import os
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class TouchCommand(Command):
 
     def __init__(self, command: str) -> 'TouchCommand':
@@ -25,7 +21,7 @@ class TouchCommand(Command):
     @Command.safe_exec
     def execute(self):
         for file in self.files:
-            filepath = normabs(file)
+            filepath = self.normabs(file)
 
             try:
                 # 如果文件不存在并且未指定 -c 选项，则创建文件

@@ -1,13 +1,9 @@
 import argparse
 import os
 import shutil
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class CpCommand(Command):
 
     def __init__(self, command: str) -> 'CpCommand':
@@ -39,8 +35,8 @@ class CpCommand(Command):
             return
 
         for src in srcs:
-            src = normabs(src)
-            dst = normabs(self.dst)
+            src = self.normabs(src)
+            dst = self.normabs(self.dst)
             # 如果目标是目录，拼接源文件名到目标路径
             if os.path.isdir(dst):
                 dst = os.path.join(dst, os.path.basename(src))

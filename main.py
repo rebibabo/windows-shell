@@ -12,7 +12,7 @@ from style import ShellLexer
 from pygments.styles import get_style_by_name
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.styles.pygments import style_from_pygments_cls
-from prompt_toolkit import prompt
+import pyperclip
 
 import getpass
 user = getpass.getuser()
@@ -111,41 +111,47 @@ class CmdWindow:
             except EOFError:
                 break
             
-    @bindings.add('tab', filter=True)
-    def complete_path( event):
-        current_text = CmdWindow.session.app.current_buffer.text      # 获取当前输入的命令
-        
-        document = CmdWindow.session.app.current_buffer.document
-        cursor_position = document.cursor_position      # 获取光标位置
-        current_text = current_text[:cursor_position]   # 获取当前光标前面部分
-        
-        if not current_text:        # 如果当前什么也没有输入，按下Tab键，则补全当前目录
-            current_text = os.getcwd()
-        ori_path = current_text.split()[-1]     # 获取当前输入的命令的最后一个参数，即路径
-        path = normabs(ori_path)                # 规范化路径
-        path = path.replace('~', os.path.expanduser('~'))
-        dirname = os.path.dirname(path)
-        basename = os.path.basename(path)
-        files_info = LsCommand(dirname).get_file_info_list(dirname)
-        suggestions = []
-        
-        for file in files_info:
-            filename = os.path.basename(file["fullpath"])
-            if re.match(basename, filename):
-                suggestions.append(filename)
-        if not suggestions:                     # 如果没有文件名以base开头，则不补全
-            return
-        elif len(suggestions) == 1:             # 如果只有一个文件名以base开头，则直接补全
-            CmdWindow.session.app.current_buffer.insert_text(suggestions[0][len(os.path.basename(path)):])
-            if os.path.isdir(os.path.join(dirname, suggestions[0])):
-                CmdWindow.session.app.current_buffer.insert_text('/')
-            else:
-                CmdWindow.session.app.current_buffer.insert_text(' ')
+@bindings.add('tab', filter=True)
+def complete_path( event):
+    current_text = CmdWindow.session.app.current_buffer.text      # 获取当前输入的命令
+    
+    document = CmdWindow.session.app.current_buffer.document
+    cursor_position = document.cursor_position      # 获取光标位置
+    current_text = current_text[:cursor_position]   # 获取当前光标前面部分
+    
+    if not current_text:        # 如果当前什么也没有输入，按下Tab键，则补全当前目录
+        current_text = os.getcwd()
+    ori_path = current_text.split()[-1]     # 获取当前输入的命令的最后一个参数，即路径
+    path = normabs(ori_path)                # 规范化路径
+    path = path.replace('~', os.path.expanduser('~'))
+    dirname = os.path.dirname(path)
+    basename = os.path.basename(path)
+    files_info = LsCommand(dirname).get_file_info_list(dirname)
+    suggestions = []
+    
+    for file in files_info:
+        filename = os.path.basename(file["fullpath"])
+        if re.match(basename, filename):
+            suggestions.append(filename)
+    if not suggestions:                     # 如果没有文件名以base开头，则不补全
+        return
+    elif len(suggestions) == 1:             # 如果只有一个文件名以base开头，则直接补全
+        CmdWindow.session.app.current_buffer.insert_text(suggestions[0][len(os.path.basename(path)):])
+        if os.path.isdir(os.path.join(dirname, suggestions[0])):
+            CmdWindow.session.app.current_buffer.insert_text('/')
         else:
-            if CmdWindow.tab_two:
-                LsCommand(f"-a {path}*").execute()
-            CmdWindow.tab_two = not CmdWindow.tab_two
-
+            CmdWindow.session.app.current_buffer.insert_text(' ')
+    else:
+        if CmdWindow.tab_two:
+            LsCommand(f"-a {path}*").execute()
+        CmdWindow.tab_two = not CmdWindow.tab_two
+   
+# 定义粘贴快捷键 Ctrl+V
+@bindings.add("c-v")
+def paste(event):
+    clipboard_content = pyperclip.paste() 
+    CmdWindow.session.app.current_buffer.insert_text(clipboard_content)
+    
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         os.chdir(normabs(sys.argv[1]))

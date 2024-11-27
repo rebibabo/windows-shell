@@ -1,12 +1,8 @@
 import argparse
 import os
-from dataclasses import dataclass
 from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
-normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
-
-@dataclass
 class MkdirCommand(Command):
 
     def __init__(self, command: str) -> 'MkdirCommand':
@@ -24,7 +20,7 @@ class MkdirCommand(Command):
     @Command.safe_exec
     def execute(self):
         for dir_path in self.dirs:
-            norm_dir_path = normabs(dir_path)
+            norm_dir_path = self.normabs(dir_path)
 
             try:
                 # 如果要创建的目录已存在
