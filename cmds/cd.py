@@ -1,7 +1,7 @@
 import argparse
 import os      
 import re
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 class CdCommand(Command):
@@ -30,7 +30,7 @@ class CdCommand(Command):
         if target_directory == '-':
             if CdCommand.last_path is None:
                 CdCommand.last_path = os.getcwd()
-                print_formatted_text(HTML(f"<error>Error: No previous directory to go back to.</error>"), style=self.log_style)
+                print(HTML(f"<error>Error: No previous directory to go back to.</error>"), style=self.log_style)
                 return
             else:
                 target_directory = CdCommand.last_path
@@ -44,7 +44,7 @@ class CdCommand(Command):
             if matched_dirs:
                 target_directory = os.path.join(current_dir, matched_dirs[0])  # 使用第一个匹配的目录
             else:
-                print_formatted_text(HTML(f"<error>Error: No matching directories found for '{self.directory}'.</error>"), style=self.log_style)
+                print(HTML(f"<error>Error: No matching directories found for '{self.directory}'.</error>"), style=self.log_style)
                 return
 
         # 获取绝对路径
@@ -52,15 +52,15 @@ class CdCommand(Command):
 
         # 检查目标目录是否存在
         if not os.path.isdir(target_directory):
-            print_formatted_text(HTML(f"<error>Error: Directory '{target_directory}' does not exist.</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: Directory '{target_directory}' does not exist.</error>"), style=self.log_style)
             return
 
         # 切换目录
         try:
             os.chdir(target_directory)
-            # print_formatted_text(HTML(f"<success>Changed directory to: '{target_directory}'</success>"), style=self.log_style)
+            # print(HTML(f"<success>Changed directory to: '{target_directory}'</success>"), style=self.log_style)
         except Exception as e:
-            print_formatted_text(HTML(f"<critical>Critical Error: Failed to change directory to '{target_directory}': {e}</critical>"), style=self.log_style)
+            print(HTML(f"<critical>Critical Error: Failed to change directory to '{target_directory}': {e}</critical>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

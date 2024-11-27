@@ -1,7 +1,7 @@
 import argparse
 import psutil
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 @dataclass
@@ -35,12 +35,12 @@ class PsCommand(Command):
                 continue
 
         if not process_list:
-            print_formatted_text(HTML("<warning>No processes found.</warning>"), style=self.log_style)
+            print(HTML("<warning>No processes found.</warning>"), style=self.log_style)
             return
 
         # 打印进程信息
         if self.verbose:
-            print_formatted_text(HTML("<b>PID  | Name                       | User                      | Status</b>"))
+            print(HTML("<b>PID  | Name                       | User                      | Status</b>"))
             print("-" * 50)
 
         for proc in process_list:
@@ -49,7 +49,7 @@ class PsCommand(Command):
             name = proc['name'][:25]  # 限制名称长度
             user = proc['username'][:25]  # 限制用户名长度
             status = proc['status']
-            print_formatted_text(HTML(f"{pid:<5} | {name:<25} | {user:<25} | {status}"))
+            print(HTML(f"{pid:<5} | {name:<25} | {user:<25} | {status}"))
 
 # 示例用法
 if __name__ == "__main__":

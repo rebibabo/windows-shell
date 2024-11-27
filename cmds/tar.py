@@ -2,7 +2,7 @@ import argparse
 import os
 import tarfile
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -27,7 +27,7 @@ class TarCommand(Command):
     @Command.safe_exec
     def execute(self):
         if not self.extract and not self.create:
-            print_formatted_text(HTML("<error>Error: Must specify either -c to create or -x to extract.</error>"), style=self.log_style)
+            print(HTML("<error>Error: Must specify either -c to create or -x to extract.</error>"), style=self.log_style)
             return
 
         tar_file = normabs(self.file)
@@ -39,7 +39,7 @@ class TarCommand(Command):
 
     def extract_tar(self, tar_file):
         if not os.path.exists(tar_file):
-            print_formatted_text(HTML(f"<error>Error: Tar file '{tar_file}' does not exist.</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: Tar file '{tar_file}' does not exist.</error>"), style=self.log_style)
             return
 
         extract_path = self.directory if self.directory else os.getcwd()
@@ -49,13 +49,13 @@ class TarCommand(Command):
             with tarfile.open(tar_file, "r") as tar:
                 tar.extractall(path=extract_path)
                 if self.verbose:
-                    print_formatted_text(HTML(f"Extracted files from <aaa fg='ansiyellow'>'{tar_file}'</aaa> to <aaa fg='ansigreen'>'{extract_path}'</aaa>"))
+                    print(HTML(f"Extracted files from <aaa fg='ansiyellow'>'{tar_file}'</aaa> to <aaa fg='ansigreen'>'{extract_path}'</aaa>"))
         except Exception as e:
-            print_formatted_text(HTML(f"<critical>Critical Error: Failed to extract '{tar_file}': {e}</critical>"), style=self.log_style)
+            print(HTML(f"<critical>Critical Error: Failed to extract '{tar_file}': {e}</critical>"), style=self.log_style)
 
     def create_tar(self, tar_file):
         if os.path.exists(tar_file) and not self.force:
-            print_formatted_text(HTML(f"<error>Error: Tar file '{tar_file}' already exists. Use -f to force overwrite.</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: Tar file '{tar_file}' already exists. Use -f to force overwrite.</error>"), style=self.log_style)
             return
 
         # To be implemented: code for creating a tar archive.

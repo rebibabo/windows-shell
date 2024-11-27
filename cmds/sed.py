@@ -2,7 +2,7 @@ import argparse
 import re
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -28,7 +28,7 @@ class SedCommand(Command):
         expression = self.expression
         match = re.match(r's/([^/]+)/([^/]+)/?', expression)
         if not match:
-            print_formatted_text(HTML(f"<error>Error: Invalid expression '{expression}'. Expected format: s/pattern/replacement/</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: Invalid expression '{expression}'. Expected format: s/pattern/replacement/</error>"), style=self.log_style)
             return
         pattern, replacement = match.groups()
 
@@ -36,7 +36,7 @@ class SedCommand(Command):
         try:
             compiled_pattern = re.compile(pattern)
         except re.error as e:
-            print_formatted_text(HTML(f"<error>Error: Invalid regular expression '{pattern}': {e}</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: Invalid regular expression '{pattern}': {e}</error>"), style=self.log_style)
             return
 
         if stream:
@@ -45,7 +45,7 @@ class SedCommand(Command):
             self._process_lines(lines, compiled_pattern, replacement)
         else:
             if not self.files:
-                print_formatted_text(HTML("<error>Error: No files specified and no input stream provided.</error>"), style=self.log_style)
+                print(HTML("<error>Error: No files specified and no input stream provided.</error>"), style=self.log_style)
                 return
 
             for file_path in self.files:
@@ -53,11 +53,11 @@ class SedCommand(Command):
                 file_lists = self.get_file_list(file_path)
 
                 if not file_lists:
-                    print_formatted_text(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
+                    print(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
                     continue
 
                 for file in file_lists:
-                    print_formatted_text(HTML(f"<aaa bg='ansiblue'>{file}:</aaa>"))
+                    print(HTML(f"<aaa bg='ansiblue'>{file}:</aaa>"))
                     try:
                         with open(file, 'r', encoding='utf-8') as f:
                             lines = f.readlines()
@@ -68,7 +68,7 @@ class SedCommand(Command):
                             with open(file, 'w', encoding='utf-8') as f:
                                 f.writelines(new_lines)
                     except Exception as e:
-                        print_formatted_text(HTML(f"<critical>Critical Error: Failed to read file '{file}': {e}</critical>"), style=self.log_style)
+                        print(HTML(f"<critical>Critical Error: Failed to read file '{file}': {e}</critical>"), style=self.log_style)
 
     def _process_lines(self, lines, pattern, replacement):
         """

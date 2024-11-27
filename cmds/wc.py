@@ -1,7 +1,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -23,14 +23,13 @@ class WcCommand(Command):
         super().__init__(command)
 
     @Command.safe_exec
-    def execute(self, stream=None):
-        if stream:
+    def execute(self, input_lines=None):
+        if input_lines:
             # 从流中读取内容
-            lines = stream.getvalue().split('\n')
-            self._count_lines(lines)
+            self._count_lines(input_lines)
         else:
             if not self.files:
-                print_formatted_text(HTML("<error>Error: No files specified and no input stream provided.</error>"), style=self.log_style)
+                print(HTML("<error>Error: No files specified and no input stream provided.</error>"), style=self.log_style)
                 return
 
             for file_path in self.files:
@@ -38,17 +37,17 @@ class WcCommand(Command):
                 file_lists = self.get_file_list(file_path)
 
                 if not file_lists:
-                    print_formatted_text(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
+                    print(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
                     continue
 
                 for file in file_lists:
-                    print_formatted_text(HTML(f"<aaa bg='ansiblue'>{file}:</aaa>"))
+                    print(HTML(f"<aaa bg='ansiblue'>{file}:</aaa>"))
                     try:
                         with open(file, 'r', encoding='utf-8') as f:
                             lines = f.readlines()
                             self._count_lines(lines)
                     except Exception as e:
-                        print_formatted_text(HTML(f"<critical>Critical Error: Failed to read file '{file}': {e}</critical>"), style=self.log_style)
+                        print(HTML(f"<critical>Critical Error: Failed to read file '{file}': {e}</critical>"), style=self.log_style)
 
     def _count_lines(self, lines):
         """

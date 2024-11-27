@@ -1,7 +1,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -33,9 +33,9 @@ class TouchCommand(Command):
                     if not self.no_create:
                         with open(filepath, 'a'):
                             os.utime(filepath, None)  # 更新访问和修改时间
-                        print_formatted_text(HTML(f"<success>Created file '{filepath}'</success>"), style=self.log_style)
+                        print(HTML(f"<success>Created file '{filepath}'</success>"), style=self.log_style)
                     else:
-                        print_formatted_text(HTML(f"<warning>File '{filepath}' does not exist and no-create option is set. Skipping.</warning>"), style=self.log_style)
+                        print(HTML(f"<warning>File '{filepath}' does not exist and no-create option is set. Skipping.</warning>"), style=self.log_style)
                         continue
                 else:
                     # 更新文件的时间戳
@@ -46,10 +46,10 @@ class TouchCommand(Command):
                     else:
                         os.utime(filepath, None)  # 更新访问和修改时间
 
-                    print_formatted_text(HTML(f"<success>Updated timestamps for '{filepath}'</success>"), style=self.log_style)
+                    print(HTML(f"<success>Updated timestamps for '{filepath}'</success>"), style=self.log_style)
 
             except Exception as e:
-                print_formatted_text(HTML(f"<error>Error: Failed to create or update '{filepath}': {e}</error>"), style=self.log_style)
+                print(HTML(f"<error>Error: Failed to create or update '{filepath}': {e}</error>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

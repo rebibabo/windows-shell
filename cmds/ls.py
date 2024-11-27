@@ -1,7 +1,7 @@
 import argparse
 from dataclasses import dataclass
 from datetime import datetime
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 import os
 import html
 from prompt_toolkit.styles import Style
@@ -99,7 +99,6 @@ class LsCommand(Command):
             
     @Command.safe_exec
     def execute(self):
-        output_str = ''
         if not self.name:
             self.name = ['.']
         for path in self.name:
@@ -107,11 +106,11 @@ class LsCommand(Command):
             files_info = self.get_file_info_list(path)
             if self.l:
                 if self.R:
-                    print_formatted_text(HTML(f"<aaa bg='ansiblue'>{normabs(html.escape(path))}:</aaa>"))
+                    print(HTML(f"<aaa bg='ansiblue'>{normabs(html.escape(path))}:</aaa>"))
                 else:
-                    print_formatted_text(HTML(f"<aaa bg='ansiblue'>{html.escape(path)}:</aaa>"))
+                    print(HTML(f"<aaa bg='ansiblue'>{html.escape(path)}:</aaa>"))
             if not files_info and not self.R:
-                print_formatted_text(HTML(f"<aaa bg='ansired'>cannot access '{html.escape(path)}': No such file or directory</aaa>\n"))
+                print(HTML(f"<aaa bg='ansired'>cannot access '{html.escape(path)}': No such file or directory</aaa>\n"))
                 continue
             files_info.sort(key=lambda x: x['basename'], reverse=self.r)
             if self.t:
@@ -175,24 +174,18 @@ class LsCommand(Command):
                             else:
                                 item = f"<file>{item['basename']}</file>"
                             row_content += item + " " * padding
-                    print_formatted_text(HTML(row_content), style=self.file_style)
-                    output_str += row_content
+                    print(HTML(row_content), style=self.file_style)
             else:
                 for file in files_info:
                     size = file['h_size'] if self.h else file['size']
-                    print_formatted_text(HTML(f"<filesize>{size:>12}</filesize>"), style=self.file_style, end='  ')
-                    output_str += f"{size:>12}  "
-                    print_formatted_text(HTML(f"<last_write_time>{file['last_write_time']}</last_write_time>"), style=self.file_style, end='  ')
-                    output_str += file['last_write_time'] + '  '
+                    print(HTML(f"<filesize>{size:>12}</filesize>"), style=self.file_style, end='  ')
+                    print(HTML(f"<last_write_time>{file['last_write_time']}</last_write_time>"), style=self.file_style, end='  ')
                     if file['mode'] == 'd':
-                        print_formatted_text(HTML(f"<directory>{file['basename']}{'/' if self.F else ''}</directory>"), style=self.file_style)
-                        output_str += file['basename'] + ('/' if self.F else '')
+                        print(HTML(f"<directory>{file['basename']}{'/' if self.F else ''}</directory>"), style=self.file_style)
                     elif file['mode'] == 'l':
-                        print_formatted_text(HTML(f"<link>{file['basename']}</link>{'*' if self.F else ''}"), style=self.file_style)
-                        output_str += file['basename'] + ('*' if self.F else '')
+                        print(HTML(f"<link>{file['basename']}</link>{'*' if self.F else ''}"), style=self.file_style)
                     else:
-                        print_formatted_text(HTML(f"<file>{file['basename']}</file>"), style=self.file_style)
-                        output_str += file['basename']
+                        print(HTML(f"<file>{file['basename']}</file>"), style=self.file_style)
             
             if self.R and files_info:
                 directories = []
@@ -202,9 +195,7 @@ class LsCommand(Command):
                 if not directories:
                     continue
                 self.name = directories
-                recursive_output = self.execute()
-                output_str += recursive_output
-        return output_str
+                self.execute()
                 
 if __name__ == "__main__":
     # 输入 lsr 命令的字符串

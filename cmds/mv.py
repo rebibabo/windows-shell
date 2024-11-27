@@ -3,7 +3,7 @@ import os
 import shutil
 import re
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -45,7 +45,7 @@ class MvCommand(Command):
 
         # 检查源路径是否存在
         if not srcs:
-            print_formatted_text(HTML(f"<error>Error: Source '{self.src}' does not exist.</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: Source '{self.src}' does not exist.</error>"), style=self.log_style)
             return
 
         for src in srcs:
@@ -59,32 +59,32 @@ class MvCommand(Command):
             if os.path.exists(dst):
                 if self.no_clobber:
                     # 不覆盖现有文件
-                    print_formatted_text(HTML(f"<warning>Skipped: '{dst}' already exists.</warning>"), style=self.log_style)
+                    print(HTML(f"<warning>Skipped: '{dst}' already exists.</warning>"), style=self.log_style)
                     return
                 elif self.interactive:
                     # 提示用户确认
                     response = input(f"Overwrite '{dst}'? [y/N]: ").strip().lower()
                     if response not in ['y', 'yes']:
-                        print_formatted_text(HTML(f"<warning>Skipped: '{dst}' not overwritten.</warning>"))
+                        print(HTML(f"<warning>Skipped: '{dst}' not overwritten.</warning>"))
                         return
                 elif self.backup:
                     # 创建备份文件
                     backup_path = dst + ".bak"
                     shutil.move(dst, backup_path)
                     if self.verbose:
-                        print_formatted_text(HTML(f"<success>Backup created: '{backup_path}'</success>"), style=self.log_style)
+                        print(HTML(f"<success>Backup created: '{backup_path}'</success>"), style=self.log_style)
                 elif not self.force:
                     # 非强制模式直接报错
-                    print_formatted_text(HTML(f"<aaa bg='ansired'>Error: '{dst}' already exists. Use -f to force overwrite.</aaa>"))
+                    print(HTML(f"<aaa bg='ansired'>Error: '{dst}' already exists. Use -f to force overwrite.</aaa>"))
                     return
 
             # 执行移动操作
             try:
                 shutil.move(src, dst)
                 if self.verbose:
-                    print_formatted_text(HTML(f"Moved <aaa fg='ansiyellow'>'{src}'</aaa> to <aaa fg='ansigreen'>'{dst}'</aaa>"))
+                    print(HTML(f"Moved <aaa fg='ansiyellow'>'{src}'</aaa> to <aaa fg='ansigreen'>'{dst}'</aaa>"))
             except Exception as e:
-                print_formatted_text(HTML(f"<critical>Error: {e}</critical>"), style=self.log_style)
+                print(HTML(f"<critical>Error: {e}</critical>"), style=self.log_style)
             
 
 # 主程序

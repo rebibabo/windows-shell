@@ -2,7 +2,7 @@ import argparse
 import os
 import shutil
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -33,44 +33,44 @@ class RmCommand(Command):
             # 检查路径是否存在
             if not target_files:
                 if not self.force:
-                    print_formatted_text(HTML(f"<error>Error: '{target}' does not exist.</error>"), style=self.log_style)
+                    print(HTML(f"<error>Error: '{target}' does not exist.</error>"), style=self.log_style)
                 continue
 
             for target_path in target_files:
                 # 处理目录删除
                 if os.path.isdir(target_path):
                     if not self.recursive:
-                        print_formatted_text(HTML(f"<error>Error: '{target}' is a directory. Use -r to remove directories.</error>"), style=self.log_style)
+                        print(HTML(f"<error>Error: '{target}' is a directory. Use -r to remove directories.</error>"), style=self.log_style)
                         continue
                     
                     if self.interactive:
                         response = input(f"Remove directory '{target}' and its contents? [y/N]: ").strip().lower()
                         if response not in ['y', 'yes']:
-                            print_formatted_text(HTML(f"<warning>Skipped: '{target}' not removed.</warning>"), style=self.log_style)
+                            print(HTML(f"<warning>Skipped: '{target}' not removed.</warning>"), style=self.log_style)
                             continue
 
                     try:
                         shutil.rmtree(target_path, ignore_errors=self.force)
                         if self.verbose:
-                            print_formatted_text(HTML(f"<success>Removed directory '{target}'</success>"), style=self.log_style)
+                            print(HTML(f"<success>Removed directory '{target}'</success>"), style=self.log_style)
                     except Exception as e:
-                        print_formatted_text(HTML(f"<critical>Critical Error: Failed to remove '{target}': {e}</critical>"), style=self.log_style)
+                        print(HTML(f"<critical>Critical Error: Failed to remove '{target}': {e}</critical>"), style=self.log_style)
 
                 # 处理文件删除
                 else:
                     if self.interactive:
                         response = input(f"Remove file '{target}'? [y/N]: ").strip().lower()
                         if response not in ['y', 'yes']:
-                            print_formatted_text(HTML(f"<warning>Skipped: '{target}' not removed.</warning>"), style=self.log_style)
+                            print(HTML(f"<warning>Skipped: '{target}' not removed.</warning>"), style=self.log_style)
                             continue
 
                     try:
                         os.remove(target_path)
                         if self.verbose:
-                            print_formatted_text(HTML(f"<success>Removed file '{target}'</success>"), style=self.log_style)
+                            print(HTML(f"<success>Removed file '{target}'</success>"), style=self.log_style)
                     except Exception as e:
                         if not self.force:
-                            print_formatted_text(HTML(f"<critical>Critical Error: Failed to remove '{target}': {e}</critical>"), style=self.log_style)
+                            print(HTML(f"<critical>Critical Error: Failed to remove '{target}': {e}</critical>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

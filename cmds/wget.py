@@ -2,7 +2,7 @@ import os
 import argparse
 import requests
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -29,7 +29,7 @@ class WgetCommand(Command):
         output_path = normabs(self.output_document or os.path.basename(url))
         
         if not url:
-            print_formatted_text(HTML("<error>Error: No URL specified.</error>"), style=self.log_style)
+            print(HTML("<error>Error: No URL specified.</error>"), style=self.log_style)
             return
 
         try:
@@ -62,9 +62,9 @@ class WgetCommand(Command):
                         print("\nDownload completed.")
 
         except requests.exceptions.RequestException as e:
-            print_formatted_text(HTML(f"<critical>Critical Error: Failed to download '{url}': {e}</critical>"), style=self.log_style)
+            print(HTML(f"<critical>Critical Error: Failed to download '{url}': {e}</critical>"), style=self.log_style)
         except Exception as e:
-            print_formatted_text(HTML(f"<error>Error: {e}</error>"), style=self.log_style)
+            print(HTML(f"<error>Error: {e}</error>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

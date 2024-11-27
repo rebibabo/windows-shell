@@ -1,7 +1,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 
 normabs = lambda x: os.path.normpath(os.path.abspath(x.replace('~', os.path.expanduser('~'))))
@@ -29,7 +29,7 @@ class MkdirCommand(Command):
             try:
                 # 如果要创建的目录已存在
                 if os.path.exists(norm_dir_path):
-                    print_formatted_text(HTML(f"<warning>Warning: Directory '{norm_dir_path}' already exists.</warning>"), style=self.log_style)
+                    print(HTML(f"<warning>Warning: Directory '{norm_dir_path}' already exists.</warning>"), style=self.log_style)
                     continue
 
                 # 如果使用- p选项，递归创建父目录
@@ -42,10 +42,10 @@ class MkdirCommand(Command):
                 if self.mode is not None:
                     os.chmod(norm_dir_path, self.mode)
 
-                print_formatted_text(HTML(f"<success>Directory '{norm_dir_path}' created successfully.</success>"), style=self.log_style)
+                print(HTML(f"<success>Directory '{norm_dir_path}' created successfully.</success>"), style=self.log_style)
 
             except Exception as e:
-                print_formatted_text(HTML(f"<error>Error: Failed to create directory '{norm_dir_path}': {e}</error>"), style=self.log_style)
+                print(HTML(f"<error>Error: Failed to create directory '{norm_dir_path}': {e}</error>"), style=self.log_style)
 
 # 示例用法
 if __name__ == "__main__":

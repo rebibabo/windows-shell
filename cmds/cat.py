@@ -1,7 +1,7 @@
 import argparse
 import os
 from dataclasses import dataclass
-from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit import HTML, print_formatted_text as print
 from cmds.base import Command
 from prompt_toolkit.application.current import get_app_session
 from prompt_toolkit.output.defaults import create_output
@@ -38,7 +38,7 @@ class CatCommand(Command):
         # output = create_output(stdout=io.StringIO())
         # print("in") 
         if not self.files:
-            print_formatted_text(HTML("<error>Error: No files specified.</error>"), style=self.log_style)
+            print(HTML("<error>Error: No files specified.</error>"), style=self.log_style)
             return
 
         for file_path in self.files:
@@ -46,7 +46,7 @@ class CatCommand(Command):
             
             # 检查文件是否存在
             if not os.path.isfile(file_path):
-                print_formatted_text(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
+                print(HTML(f"<error>Error: File '{file_path}' does not exist or is not a file.</error>"), style=self.log_style)
                 continue
 
             try:
@@ -62,10 +62,10 @@ class CatCommand(Command):
                         line_prefix = ""
 
                     line_content = line.rstrip("\n") + ("$" if self.show_ends else "")
-                    print_formatted_text(HTML(f"{line_prefix}{line_content}"))
+                    print(HTML(f"{line_prefix}{line_content}"))
 
             except Exception as e:
-                print_formatted_text(HTML(f"<critical>Critical Error: Failed to read file '{file_path}': {e}</critical>"), style=self.log_style)
+                print(HTML(f"<critical>Critical Error: Failed to read file '{file_path}': {e}</critical>"), style=self.log_style)
         
         # b = app._output.stdout.getvalue()
         # app._output = original_stdout
