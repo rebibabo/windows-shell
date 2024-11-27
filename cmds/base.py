@@ -26,7 +26,7 @@ class Command:
         :return: Command 实例
         """
         # 将字符串拆分成列表，类似于命令行参数
-        args = command.split()
+        args = self.split_command(command)
         self.parse_error = False
         if not hasattr(self, 'parser'):
             return
@@ -40,6 +40,28 @@ class Command:
             setattr(self, key, value)  # 将解析结果添加到实例属性中
         
         return self
+    
+    def split_command(self, command: str) -> List[str]:
+        """
+        按空格分割参数，当参数有引号时，不保留引号，引号内空格不会分割。
+
+        :param args: 参数字符串。
+        :return: 参数列表。
+        """
+        args = []
+        current_arg = ''
+        in_quotes = False
+        for char in command:
+            if char in ['"', "'"]:
+                in_quotes = not in_quotes
+            elif char == ' ' and not in_quotes:
+                args.append(current_arg)
+                current_arg = ''
+            else:
+                current_arg += char
+        if current_arg:
+            args.append(current_arg)
+        return args
 
     def get_file_list(self, path: str, traverse: bool = True, recursive: bool = False, include_dirs: bool = True) -> List[str]:
         """
