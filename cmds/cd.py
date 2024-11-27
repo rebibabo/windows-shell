@@ -11,14 +11,14 @@ class CdCommand(Command):
         解析 cd 命令并返回 CdCommand 实例。
         """
         parser = argparse.ArgumentParser(description="Change the current directory.", add_help=False)
-        parser.add_argument("directory", type=str, help="Target directory to change to")
+        parser.add_argument("directory", nargs="*", type=str, help="Target directory to change to")     # 如果有空格的话，会拆分为不同的参数
         
         self.parser = parser
         super().__init__(command)
 
     @Command.safe_exec
     def execute(self):
-        target_directory = self.directory
+        target_directory = ' '.join(self.directory) # 在这里把参数列表拼接成字符串
         if target_directory.endswith('\\') or target_directory.endswith('/'):
             target_directory = target_directory[:-1]
         

@@ -112,16 +112,22 @@ class CmdWindow:
                 break
             
 @bindings.add('tab', filter=True)
-def complete_path( event):
+def complete_path(event):
     current_text = CmdWindow.session.app.current_buffer.text      # 获取当前输入的命令
     
     document = CmdWindow.session.app.current_buffer.document
     cursor_position = document.cursor_position      # 获取光标位置
     current_text = current_text[:cursor_position]   # 获取当前光标前面部分
     
-    if not current_text:        # 如果当前什么也没有输入，按下Tab键，则补全当前目录
-        current_text = os.getcwd()
-    ori_path = current_text.split()[-1]     # 获取当前输入的命令的最后一个参数，即路径
+    if not current_text:        # 如果当前什么也没有输入，则退出
+        return
+    if '"' in current_text:     # 如果当前输入中有双引号
+        ori_path = current_text.split('"')[-1]     # 获取双引号后面的部分，即路径
+    elif "'" in current_text:   # 如果当前输入中有单引号
+        ori_path = current_text.split("'")[-1]     # 获取单引号后面的部分，即路径
+    else:                       # 如果当前输入中没有引号
+        ori_path = current_text.split()[-1]     # 获取当前输入的命令的最后一个参数，即路径
+        
     path = normabs(ori_path)                # 规范化路径
     path = path.replace('~', os.path.expanduser('~'))
     dirname = os.path.dirname(path)
@@ -133,6 +139,8 @@ def complete_path( event):
         filename = os.path.basename(file["fullpath"])
         if re.match(basename, filename):
             suggestions.append(filename)
+    
+    # print(suggestions)
     if not suggestions:                     # 如果没有文件名以base开头，则不补全
         return
     elif len(suggestions) == 1:             # 如果只有一个文件名以base开头，则直接补全
@@ -143,7 +151,7 @@ def complete_path( event):
             CmdWindow.session.app.current_buffer.insert_text(' ')
     else:
         if CmdWindow.tab_two:
-            LsCommand(f"-a {path}*").execute()
+            LsCommand(f"-a '{path}*'").execute()    # 需要加上两个双引号确保解析正确
         CmdWindow.tab_two = not CmdWindow.tab_two
    
 # 定义粘贴快捷键 Ctrl+V
