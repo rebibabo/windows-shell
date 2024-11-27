@@ -3,7 +3,7 @@
 
 # 环境安装
 仅依赖prompt-toolkit工具，纯python代码
-```pip install prompt_toolkit```
+```pip install prompt_toolkit pyperclip```
 
 # 启动脚本
 运行main.py即可
